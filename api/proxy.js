@@ -1,11 +1,26 @@
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Max-Age", "86400");
 
-  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method === "OPTIONS") {
+    res.status(204).end();
+    return;
+  }
 
-  const { type, fileKey, nodeId, url } = req.body || req.query;
+  let body = req.body;
+  if (typeof body === "string") {
+    try { body = JSON.parse(body); } catch {}
+  }
+
+  const { type, fileKey, nodeId, url } = body || req.query || {};
 
   try {
     // --- Figma fetch ---
